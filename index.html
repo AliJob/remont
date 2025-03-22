@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин & Сервис</title>
+    <link rel="stylesheet" href="css.css">
+</head>
+<body>
+<video autoplay muted loop class="background-video" playsinline>
+    <source src="video_2025-03-22_17-37-46.mp4" type="video/mp4">
+</video>
+
+<div class="container">
+    <!-- Заголовок и услуги -->
+    <h1 class="title">Магазин по ремонту электротоваров</h1>
+    <p class="description">Ремонт самокатов, велосипедов и электротоваров !</p>
+    <div id="services" class="services"></div>
+    <!--<button class="button">Записаться на ремонт</button>-->
+
+    <!-- Галерея -->
+    <section class="section">
+        <h2>Галерея</h2>
+        <div class="gallery">
+            <img src="photo_2025-03-22_17-38-21.jpg" alt="Фото магазина 1">
+            <img src="photo_2025-03-22_17-38-28.jpg" alt="Фото магазина 2">
+            <img src="photo_2025-03-22_17-38-28.jpg" alt="Фото магазина 3">
+            <img src="photo_2025-03-22_17-38-28.jpg" alt="Фото магазина 4">
+        </div>
+    </section>
+
+    <!-- Контакты и карта -->
+    <section class="section contact-section">
+        <h2>Контакты</h2>
+        <div class="contact-container">
+            <div class="contact-info">
+                <p>📞 Телефон: <a href="tel:+79314186666">+7 (123) 456-78-90</a></p>
+                <p>📱 WhatsApp: <a href="https://wa.me/79314186666">Написать в WhatsApp</a></p>
+                <p>✈️ Telegram: <a href="https://t.me/your_shop">@your_shop</a></p>
+                <p>📍 Адрес: ул. Варшавское шоссе 132/1</p>
+                <p>⏰ Часы работы: Пн-Пт 9:00-20:00, Сб-Вс 10:00-18:00</p>
+            </div>
+            <div class="map">
+                <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3A..."></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Отзывы -->
+    <section class="section">
+        <h2>Отзывы</h2>
+        <div class="reviews-container">
+            <form id="reviewForm" class="review-form">
+                <input type="text" placeholder="Ваше имя" required>
+                <textarea placeholder="Ваш отзыв" required></textarea>
+                <button type="submit">Оставить отзыв</button>
+            </form>
+            <div id="reviewsList" class="reviews-list"></div>
+        </div>
+    </section>
+</div>
+
+<script src="index.js"></script>
+</body>
+</html>
