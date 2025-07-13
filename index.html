@@ -8,20 +8,19 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 flex flex-col h-screen overflow-hidden">
+<body class="bg-gradient-to-b from-gray-100 to-blue-100 flex flex-col h-screen overflow-hidden">
   <!-- Header -->
-  <header class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex justify-between items-center shadow-lg">
-    <div class="flex items-center space-x-2">
-      <img src="https://4kruga.ru/wp-content/uploads/2023/03/cropped-logo-e1678283760542.png" alt="Логотип" class="h-8">
-      <h1 class="text-xl font-bold">4 Круга - Магазин</h1>
+  <header class="bg-gradient-to-r from-blue-700 to-indigo-600 text-white p-4 flex justify-between items-center shadow-lg z-10">
+    <div class="flex items-center space-x-3">
+      <img src="https://4kruga.ru/wp-content/uploads/2023/03/cropped-logo-e1678283760542.png" alt="Логотип" class="h-10">
+      <h1 class="text-2xl font-extrabold tracking-tight">4 Круга - Магазин</h1>
     </div>
-    <button id="close-btn" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition duration-200">Закрыть</button>
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1 overflow-y-auto">
-    <!-- Search Bar -->
-    <div class="p-4 bg-white shadow-sm">
+  <main class="flex-1 overflow-y-auto p-4">
+    <!-- Search Bar (Collapsible) -->
+    <div id="search-container" class="hidden bg-white rounded-lg shadow-md p-4 mb-4 transition-all duration-300">
       <div class="relative">
         <input id="search-input" type="text" placeholder="Поиск запчастей..." 
                class="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -32,34 +31,45 @@
     </div>
 
     <!-- Category Filters -->
-    <div class="p-4">
-      <div class="flex flex-wrap gap-2">
-        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="all">Все</button>
-        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="scooter">Электросамокаты</button>
-        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="kick_scooter">Самокаты</button>
-        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="bicycle">Велосипеды</button>
-        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="ebike">Электровелосипеды</button>
-        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="stroller">Детские коляски</button>
-        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="wheelchair">Инвалидные коляски</button>
-      </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+      <button class="category-btn bg-white text-blue-700 p-3 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105" data-category="all">Все</button>
+      <button class="category-btn bg-white text-blue-700 p-3 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105" data-category="scooter">Электросамокаты</button>
+      <button class="category-btn bg-white text-blue-700 p-3 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105" data-category="kick_scooter">Самокаты</button>
+      <button class="category-btn bg-white text-blue-700 p-3 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105" data-category="bicycle">Велосипеды</button>
+      <button class="category-btn bg-white text-blue-700 p-3 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105" data-category="ebike">Электровелосипеды</button>
+      <button class="category-btn bg-white text-blue-700 p-3 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105" data-category="stroller">Детские коляски</button>
+      <button class="category-btn bg-white text-blue-700 p-3 rounded-lg shadow-md hover:shadow-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105" data-category="wheelchair">Инвалидные коляски</button>
     </div>
 
     <!-- Store Container -->
-    <div id="store-container" class="p-4">
+    <div id="store-container" class="relative">
       <div id="loading-spinner" class="hidden flex items-center justify-center h-64">
         <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
       </div>
-      <iframe id="store-iframe" class="w-full h-[600px] border-none hidden" 
+      <iframe id="store-iframe" class="w-full h-[600px] border-none rounded-lg shadow-inner hidden" 
               src="https://4kruga.ru/?srsltid=AfmBOoookdwM9Dm-k4D_v2pB6clJtAose4cNzVVEPTeh-4JnhZcTzVBo"></iframe>
     </div>
   </main>
 
-  <!-- Footer with Main Button -->
-  <footer class="bg-white p-4 shadow-inner">
-    <button id="main-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-200 hidden">
-      Перейти к оформлению
+  <!-- Floating Action Buttons -->
+  <div class="fixed bottom-6 right-6 flex flex-col space-y-3 z-20">
+    <button id="search-btn" class="floating-btn bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 transform hover:scale-110">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
     </button>
-  </footer>
+    <button id="cart-btn" class="floating-btn bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-all duration-200 transform hover:scale-110 relative">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+      </svg>
+      <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+    </button>
+    <button id="close-btn" class="floating-btn bg-red-500 text-white p-4 rounded-full shadow-lg hover:bg-red-600 transition-all duration-200 transform hover:scale-110">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
 
   <script src="script.js"></script>
 </body>
