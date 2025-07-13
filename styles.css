@@ -24,6 +24,10 @@ body {
   opacity: 1;
 }
 
+#product-list, #cart-summary {
+  animation: fadeIn 0.5s ease-in;
+}
+
 .floating-btn {
   transition: all 0.2s ease-in-out;
 }
@@ -37,30 +41,7 @@ body {
   transform: scale(0.95);
 }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-#cart-btn:not(.hidden) {
-  animation: pulse 2s infinite;
-}
-
-#store-container {
-  animation: fadeIn 0.5s ease-in;
-}
-
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-#cart-modal:not(.hidden) {
-  animation: modalFadeIn 0.3s ease-in;
-}
-
-@keyframes modalFadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
 }
