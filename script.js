@@ -4,11 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
   Telegram.WebApp.expand();
 
   // Get elements
+  const searchContainer = document.getElementById('search-container');
   const searchInput = document.getElementById('search-input');
   const storeIframe = document.getElementById('store-iframe');
   const loadingSpinner = document.getElementById('loading-spinner');
+  const searchBtn = document.getElementById('search-btn');
+  const cartBtn = document.getElementById('cart-btn');
+  const cartCount = document.getElementById('cart-count');
   const closeBtn = document.getElementById('close-btn');
-  const mainBtn = document.getElementById('main-btn');
   const categoryButtons = document.querySelectorAll('.category-btn');
 
   // Get Telegram user data
@@ -17,14 +20,28 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Пользователь:', user);
   }
 
-  // Handle close button
-  closeBtn.addEventListener('click', () => {
-    Telegram.WebApp.close();
-  });
+  // Cart state (replace with store API if available)
+  let cartItems = 0;
 
-  // Handle back button
-  Telegram.WebApp.onEvent('backButtonClicked', () => {
-    Telegram.WebApp.close();
+  // Update cart button and Telegram MainButton
+  function updateCartButton() {
+    if (cartItems > 0) {
+      cartCount.textContent = cartItems;
+      cartCount.classList.remove('hidden');
+      Telegram.WebApp.MainButton.show();
+      Telegram.WebApp.MainButton.setText(`Оформить заказ (${cartItems})`);
+    } else {
+      cartCount.classList.add('hidden');
+      Telegram.WebApp.MainButton.hide();
+    }
+  }
+
+  // Handle search button (toggle search bar)
+  searchBtn.addEventListener('click', () => {
+    searchContainer.classList.toggle('hidden');
+    if (!searchContainer.classList.contains('hidden')) {
+      searchInput.focus();
+    }
   });
 
   // Handle search
@@ -55,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categoryButtons.forEach(btn => btn.classList.remove('bg-blue-500', 'text-white'));
       button.classList.add('bg-blue-500', 'text-white');
 
-      // Map categories to store URLs or search queries
+      // Map categories to store URLs
       const categoryMap = {
         all: 'https://4kruga.ru/',
         scooter: 'https://4kruga.ru/product-category/elektrosamokaty/',
@@ -74,36 +91,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Simulate cart preview (replace with actual store API if available)
-  let cartItems = 0; // Placeholder for cart count
-  function updateMainButton() {
+  // Handle cart button
+  cartBtn.addEventListener('click', () => {
     if (cartItems > 0) {
-      mainBtn.textContent = `Перейти к оформлению (${cartItems})`;
-      mainBtn.classList.remove('hidden');
-      Telegram.WebApp.MainButton.show();
-      Telegram.WebApp.MainButton.setText(`Перейти к оформлению (${cartItems})`);
+      Telegram.WebApp.MainButton.click();
     } else {
-      mainBtn.classList.add('hidden');
-      Telegram.WebApp.MainButton.hide();
+      Telegram.WebApp.showAlert('Ваша корзина пуста!');
     }
-  }
+  });
 
-  // Handle main button click (e.g., proceed to checkout)
+  // Handle main button click (proceed to checkout)
   Telegram.WebApp.MainButton.onClick(() => {
     Telegram.WebApp.sendData(JSON.stringify({ action: 'proceed_to_checkout', items: cartItems }));
   });
 
-  // Simulate adding to cart (replace with actual store interaction)
-  // Example: Listen for messages from iframe or integrate with store API
+  // Handle close button
+  closeBtn.addEventListener('click', () => {
+    Telegram.WebApp.close();
+  });
+
+  // Handle back button
+  Telegram.WebApp.onEvent('backButtonClicked', () => {
+    Telegram.WebApp.close();
+  });
+
+  // Simulate adding to cart (replace with store API integration)
   window.addEventListener('message', (event) => {
     if (event.origin === 'https://4kruga.ru') {
       if (event.data.action === 'add_to_cart') {
         cartItems++;
-        updateMainButton();
+        updateCartButton();
       }
     }
   });
 
   // Initial load
-  updateMainButton();
+  updateCartButton();
 });
