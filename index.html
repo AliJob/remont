@@ -42,6 +42,23 @@
         </div>
       </div>
 
+      <!-- Product List -->
+      <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 hidden">
+        <!-- Product cards will be dynamically inserted here -->
+      </div>
+
+      <!-- Cart Summary -->
+      <div id="cart-summary" class="bg-white/10 backdrop-blur-lg rounded-lg shadow-md p-4 mb-4 hidden">
+        <h2 class="text-xl font-bold mb-4">Корзина</h2>
+        <div id="cart-items" class="space-y-4 max-h-32 overflow-y-auto">
+          <!-- Cart items will be dynamically inserted here -->
+        </div>
+        <div class="mt-4 flex justify-between items-center">
+          <span class="text-lg font-semibold">Итого: <span id="cart-total">0 ₽</span></span>
+          <button id="checkout-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200">Оформить заказ</button>
+        </div>
+      </div>
+
       <!-- Worker Dashboard -->
       <div id="worker-dashboard" class="hidden bg-white/10 backdrop-blur-lg rounded-lg shadow-md p-4 mb-6">
         <h2 class="text-xl font-bold mb-4">Панель работника</h2>
@@ -69,21 +86,6 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
       </svg>
     </button>
-  </div>
-
-  <!-- Cart Summary Modal -->
-  <div id="cart-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-30">
-    <div class="bg-white/10 backdrop-blur-lg rounded-lg p-6 w-full max-w-md">
-      <h2 class="text-xl font-bold mb-4">Корзина</h2>
-      <div id="cart-items" class="space-y-4 max-h-64 overflow-y-auto">
-        <!-- Cart items will be dynamically inserted here -->
-      </div>
-      <div class="mt-4 flex justify-between items-center">
-        <span class="text-lg font-semibold">Итого: <span id="cart-total">0 ₽</span></span>
-        <button id="checkout-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200">Оформить заказ</button>
-      </div>
-      <button id="close-cart-btn" class="mt-4 text-gray-400 hover:text-white">Закрыть</button>
-    </div>
   </div>
 
   <script src="script.js"></script>
