@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const optionsContainer = document.getElementById('options-container');
   const searchContainer = document.getElementById('search-container');
   const searchInput = document.getElementById('search-input');
+  const productList = document.getElementById('product-list');
+  const cartSummary = document.getElementById('cart-summary');
+  const cartItems = document.getElementById('cart-items');
+  const cartTotal = document.getElementById('cart-total');
+  const checkoutBtn = document.getElementById('checkout-btn');
   const workerDashboard = document.getElementById('worker-dashboard');
   const pendingOrders = document.getElementById('pending-orders');
   const restockBtn = document.getElementById('restock-btn');
@@ -18,16 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const cartBtn = document.getElementById('cart-btn');
   const cartCount = document.getElementById('cart-count');
   const closeBtn = document.getElementById('close-btn');
-  const cartModal = document.getElementById('cart-modal');
-  const cartItemsContainer = document.getElementById('cart-items');
-  const cartTotal = document.getElementById('cart-total');
-  const checkoutBtn = document.getElementById('checkout-btn');
-  const closeCartBtn = document.getElementById('close-cart-btn');
 
-  // WooCommerce API configuration (placeholders, replace with secure method)
-  const API_BASE_URL = 'https://4kruga.ru/wp-json/wc/v3';
-  const CONSUMER_KEY = 'your_consumer_key'; // Replace with your WooCommerce Consumer Key
-  const CONSUMER_SECRET = 'your_consumer_secret'; // Replace with your WooCommerce Consumer Secret
+  // OpenCart API configuration
+  const API_BASE_URL = 'https://4kruga.ru/index.php?route=api';
+  const API_KEY = '4zrEXMmoBgstC7dRKxp12NV7nqNCzpY1PZ4uXWU8YtTxDYzFVcb2HcwzAEdfuqPInNMTWPdrDFbKFs0NAFUAclEOwzKSdW80Oo0kWXPQKSxBwvf8lTC5lVYRtNIuvY0RyDTZO5zjLX8HNmvhpLbhWRI6KBBFzMKoyKYR4LqSu0W6wGfoHbK0Qym0yi95Y9TurqWKrKfTYZSf7uIfaiuaqSFDXtVdFEMBJnN3nBUrvmPtxbwbdpijluxj4rWmAYgh';
 
   // Worker IDs (replace with actual Telegram IDs of workers)
   const WORKER_IDS = ['admin_id1', 'admin_id2'];
@@ -50,24 +49,81 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   loadStore();
 
-  // Update cart button and Telegram MainButton
-  function updateCartButton() {
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    if (totalItems > 0) {
-      cartCount.textContent = totalItems;
-      cartCount.classList.remove('hidden');
-      Telegram.WebApp.MainButton.show();
-      Telegram.WebApp.MainButton.setText(`Оформить заказ (${totalItems})`);
-    } else {
-      cartCount.classList.add('hidden');
-      Telegram.WebApp.MainButton.hide();
+  // Fetch products from OpenCart API
+  async function fetchProducts(query = '') {
+    try {
+      loadingSpinner.classList.remove('hidden');
+      productList.classList.add('hidden');
+      storeContainer.classList.add('hidden');
+
+      const url = `${API_BASE_URL}/product&filter_name=${encodeURIComponent(query)}&api_key=${API_KEY}`;
+      const response = await fetch(url);
+      const products = await response.json();
+
+      productList.innerHTML = '';
+      products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'bg-white/10 backdrop-blur-lg rounded-lg shadow-md p-4 transition-all duration-200 hover:scale-105';
+        productCard.innerHTML = `
+          <img src="${product.image || 'https://via.placeholder.com/150'}" alt="${product.name}" class="w-full h-32 object-cover rounded-lg mb-2">
+          <h3 class="text-lg font-semibold">${product.name}</h3>
+          <p class="text-gray-400">${product.price} ₽</p>
+          <button class="add-to-cart bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200 mt-2" data-id="${product.product_id}" data-name="${product.name}" data-price="${product.price}">Добавить в корзину</button>
+        `;
+        productList.appendChild(productCard);
+      });
+
+      productList.classList.remove('hidden');
+      storeContainer.classList.add('hidden');
+      loadingSpinner.classList.add('hidden');
+
+      // Add to cart listeners
+      document.querySelectorAll('.add-to-cart').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          const name = btn.dataset.name;
+          const price = parseFloat(btn.dataset.price);
+          const existingItem = cart.find(item => item.id === id);
+          if (existingItem) {
+            existingItem.quantity++;
+          } else {
+            cart.push({ id, name, price, quantity: 1 });
+          }
+          updateCart();
+          Telegram.WebApp.showAlert('Товар добавлен в корзину!');
+        });
+      });
+    } catch (error) {
+      console.error('Ошибка загрузки товаров:', error);
+      Telegram.WebApp.showAlert('Ошибка загрузки товаров. Попробуйте позже.');
+      productList.classList.add('hidden');
+      storeContainer.classList.remove('hidden');
+      loadingSpinner.classList.add('hidden');
     }
-    updateCartModal();
   }
 
-  // Update cart modal
-  function updateCartModal() {
-    cartItemsContainer.innerHTML = '';
+  // Fetch cart products from OpenCart API
+  async function fetchCartProducts() {
+    try {
+      const url = `${API_BASE_URL}/cart/products&api_key=${API_KEY}`;
+      const response = await fetch(url);
+      const cartData = await response.json();
+      cart = cartData.products.map(product => ({
+        id: product.product_id,
+        name: product.name,
+        price: parseFloat(product.price),
+        quantity: product.quantity
+      }));
+      updateCart();
+    } catch (error) {
+      console.error('Ошибка загрузки корзины:', error);
+      Telegram.WebApp.showAlert('Ошибка загрузки корзины.');
+    }
+  }
+
+  // Update cart display
+  function updateCart() {
+    cartItems.innerHTML = '';
     let totalPrice = 0;
     cart.forEach(item => {
       totalPrice += item.price * item.quantity;
@@ -80,40 +136,63 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <button class="remove-item text-red-400 hover:text-red-600" data-id="${item.id}">Удалить</button>
       `;
-      cartItemsContainer.appendChild(itemElement);
+      cartItems.appendChild(itemElement);
     });
     cartTotal.textContent = `${totalPrice} ₽`;
+    cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.classList.toggle('hidden', cart.length === 0);
+    Telegram.WebApp.MainButton.toggle(cart.length > 0);
+    Telegram.WebApp.MainButton.setText(`Оформить заказ (${cart.length})`);
 
     // Add remove item listeners
     document.querySelectorAll('.remove-item').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id;
         cart = cart.filter(item => item.id !== id);
-        updateCartButton();
+        updateCart();
       });
     });
   }
 
-  // Handle options toggle
-  optionsToggle.addEventListener('click', () => {
-    optionsContainer.classList.toggle('hidden');
-    floatingButtons.classList.toggle('hidden');
-    if (!optionsContainer.classList.contains('hidden') && WORKER_IDS.includes(user?.id.toString())) {
-      workerDashboard.classList.remove('hidden');
-      fetchPendingOrders();
-    }
-  });
+  // Create order via OpenCart API
+  async function createOrder() {
+    try {
+      const orderData = {
+        products: cart.map(item => ({
+          product_id: item.id,
+          quantity: item.quantity
+        })),
+        customer: {
+          firstname: user?.first_name || 'Гость',
+          lastname: user?.last_name || '',
+          email: 'guest@4kruga.ru',
+          telephone: ''
+        },
+        payment_method: 'cod',
+        shipping_method: 'flat.flat'
+      };
 
-  // Handle search
-  searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      const query = searchInput.value.trim();
-      if (query) {
-        // Simulate search (replace with API if needed)
-        Telegram.WebApp.showAlert(`Поиск: ${query} (демо)`);
+      const response = await fetch(`${API_BASE_URL}/order/add&api_key=${API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+
+      if (response.ok) {
+        cart = [];
+        updateCart();
+        optionsContainer.classList.add('hidden');
+        floatingButtons.classList.add('hidden');
+        Telegram.WebApp.showAlert('Заказ успешно оформлен!');
+        Telegram.WebApp.sendData(JSON.stringify({ action: 'order_placed' }));
+      } else {
+        throw new Error('Ошибка оформления заказа');
       }
+    } catch (error) {
+      console.error('Ошибка оформления заказа:', error);
+      Telegram.WebApp.showAlert('Ошибка оформления заказа. Попробуйте позже.');
     }
-  });
+  }
 
   // Fetch pending orders (mock data, replace with API)
   async function fetchPendingOrders() {
@@ -149,14 +228,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Handle restock button
-  restockBtn.addEventListener('click', () => {
-    Telegram.WebApp.showAlert('Склад пополнен (демо-действие)!');
+  // Handle options toggle
+  optionsToggle.addEventListener('click', () => {
+    optionsContainer.classList.toggle('hidden');
+    floatingButtons.classList.toggle('hidden');
+    if (!optionsContainer.classList.contains('hidden')) {
+      fetchCartProducts();
+      if (WORKER_IDS.includes(user?.id.toString())) {
+        workerDashboard.classList.remove('hidden');
+        fetchPendingOrders();
+      }
+    } else {
+      workerDashboard.classList.add('hidden');
+    }
   });
 
-  // Handle cart button
-  cartBtn.addEventListener('click', () => {
-    cartModal.classList.toggle('hidden');
+  // Handle search
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      const query = searchInput.value.trim();
+      if (query) {
+        fetchProducts(query);
+      }
+    }
   });
 
   // Handle checkout
@@ -165,15 +259,12 @@ document.addEventListener('DOMContentLoaded', () => {
       Telegram.WebApp.showAlert('Ваша корзина пуста!');
       return;
     }
-    Telegram.WebApp.showAlert('Заказ оформлен (демо)!');
-    cart = [];
-    updateCartButton();
-    cartModal.classList.add('hidden');
+    createOrder();
   });
 
-  // Handle close cart modal
-  closeCartBtn.addEventListener('click', () => {
-    cartModal.classList.add('hidden');
+  // Handle cart button
+  cartBtn.addEventListener('click', () => {
+    cartSummary.classList.toggle('hidden');
   });
 
   // Handle close button
@@ -183,9 +274,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle main button click
   Telegram.WebApp.MainButton.onClick(() => {
-    cartModal.classList.remove('hidden');
+    cartSummary.classList.remove('hidden');
   });
 
-  // Initial load
-  updateCartButton();
+  // Handle restock button
+  restockBtn.addEventListener('click', () => {
+    Telegram.WebApp.showAlert('Склад пополнен (демо-действие)!');
+  });
 });
