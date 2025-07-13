@@ -1,65 +1,66 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Магазин & Сервис</title>
-    <link rel="stylesheet" href="css.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Наш магазин</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<video autoplay muted loop class="background-video" playsinline>
-    <source src="video_2025-03-22_17-37-46.mp4" type="video/mp4">
-</video>
+<body class="bg-gray-50 flex flex-col h-screen overflow-hidden">
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex justify-between items-center shadow-lg">
+    <div class="flex items-center space-x-2">
+      <img src="https://4kruga.ru/wp-content/uploads/2023/03/cropped-logo-e1678283760542.png" alt="Логотип" class="h-8">
+      <h1 class="text-xl font-bold">4 Круга - Магазин</h1>
+    </div>
+    <button id="close-btn" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition duration-200">Закрыть</button>
+  </header>
 
-<div class="container">
-    <!-- Заголовок и услуги -->
-    <h1 class="title">Магазин по ремонту электротоваров</h1>
-    <p class="description">Ремонт самокатов, велосипедов и электротоваров !</p>
-    <div id="services" class="services"></div>
-    <!--<button class="button">Записаться на ремонт</button>-->
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto">
+    <!-- Search Bar -->
+    <div class="p-4 bg-white shadow-sm">
+      <div class="relative">
+        <input id="search-input" type="text" placeholder="Поиск запчастей..." 
+               class="w-full p-3 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <svg class="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+    </div>
 
-    <!-- Галерея -->
-    <section class="section">
-        <h2>Галерея</h2>
-        <div class="gallery">
-            <img src="photo_2025-03-22_17-38-21.jpg" alt="Фото магазина 1">
-            <img src="photo_2025-03-22_17-38-28.jpg" alt="Фото магазина 2">
-            <img src="photo_2025-03-22_17-38-28.jpg" alt="Фото магазина 3">
-            <img src="photo_2025-03-22_17-38-28.jpg" alt="Фото магазина 4">
-        </div>
-    </section>
+    <!-- Category Filters -->
+    <div class="p-4">
+      <div class="flex flex-wrap gap-2">
+        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="all">Все</button>
+        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="scooter">Электросамокаты</button>
+        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="kick_scooter">Самокаты</button>
+        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="bicycle">Велосипеды</button>
+        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="ebike">Электровелосипеды</button>
+        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="stroller">Детские коляски</button>
+        <button class="category-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition duration-200" data-category="wheelchair">Инвалидные коляски</button>
+      </div>
+    </div>
 
-    <!-- Контакты и карта -->
-    <section class="section contact-section">
-        <h2>Контакты</h2>
-        <div class="contact-container">
-            <div class="contact-info">
-                <p>📞 Телефон: <a href="tel:+79314186666">+7 (123) 456-78-90</a></p>
-                <p>📱 WhatsApp: <a href="https://wa.me/79314186666">Написать в WhatsApp</a></p>
-                <p>✈️ Telegram: <a href="https://t.me/your_shop">@your_shop</a></p>
-                <p>📍 Адрес: ул. Варшавское шоссе 132/1</p>
-                <p>⏰ Часы работы: Пн-Пт 9:00-20:00, Сб-Вс 10:00-18:00</p>
-            </div>
-            <div class="map">
-                <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3A..."></iframe>
-            </div>
-        </div>
-    </section>
+    <!-- Store Container -->
+    <div id="store-container" class="p-4">
+      <div id="loading-spinner" class="hidden flex items-center justify-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
+      </div>
+      <iframe id="store-iframe" class="w-full h-[600px] border-none hidden" 
+              src="https://4kruga.ru/?srsltid=AfmBOoookdwM9Dm-k4D_v2pB6clJtAose4cNzVVEPTeh-4JnhZcTzVBo"></iframe>
+    </div>
+  </main>
 
-    <!-- Отзывы -->
-    <section class="section">
-        <h2>Отзывы</h2>
-        <div class="reviews-container">
-            <form id="reviewForm" class="review-form">
-                <input type="text" placeholder="Ваше имя" required>
-                <textarea placeholder="Ваш отзыв" required></textarea>
-                <button type="submit">Оставить отзыв</button>
-            </form>
-            <div id="reviewsList" class="reviews-list"></div>
-        </div>
-    </section>
-</div>
+  <!-- Footer with Main Button -->
+  <footer class="bg-white p-4 shadow-inner">
+    <button id="main-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-200 hidden">
+      Перейти к оформлению
+    </button>
+  </footer>
 
-<script src="index.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
