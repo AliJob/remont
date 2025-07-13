@@ -3,27 +3,25 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-#search-container {
+#store-iframe {
+  min-height: 600px;
+  width: 100%;
+  transition: opacity 0.5s ease-in;
+}
+
+#loading-spinner {
+  min-height: 100%;
+}
+
+#options-container {
   transform: translateY(-20px);
   opacity: 0;
   transition: all 0.3s ease-in-out;
 }
 
-#search-container:not(.hidden) {
+#options-container:not(.hidden) {
   transform: translateY(0);
   opacity: 1;
-}
-
-.category-btn {
-  transition: all 0.2s ease-in-out;
-}
-
-.category-btn:hover {
-  transform: scale(1.05) translateY(-2px);
-}
-
-.category-btn:active {
-  transform: scale(1);
 }
 
 .floating-btn {
@@ -49,7 +47,7 @@ body {
   animation: pulse 2s infinite;
 }
 
-#product-list, #worker-dashboard, #cart-modal {
+#store-container {
   animation: fadeIn 0.5s ease-in;
 }
 
