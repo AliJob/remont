@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const cartBtn = document.getElementById('cart-btn');
   const cartCount = document.getElementById('cart-count');
   const closeBtn = document.getElementById('close-btn');
+  const whatsappBtn = document.getElementById('whatsapp-btn');
+  const telegramBtn = document.getElementById('telegram-btn');
+  const phoneBtn = document.getElementById('phone-btn');
 
   // OpenCart API configuration
   const API_BASE_URL = 'https://4kruga.ru/index.php?route=api';
@@ -121,8 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchCartProducts() {
     try {
       const url = `${API_BASE_URL}/cart/products&api_key=${API_KEY}`;
+      console.log('Запрос корзины:', url);
       const response = await fetch(url);
+      console.log('Статус ответа:', response.status);
+      console.log('Полный ответ:', await response.text());
       const cartData = await response.json();
+      console.log('Данные корзины:', cartData);
       cart = cartData.products.map(product => ({
         id: product.product_id,
         name: product.name,
@@ -132,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateCart();
     } catch (error) {
       console.error('Ошибка загрузки корзины:', error);
-      Telegram.WebApp.showAlert('Ошибка загрузки корзины.');
+      Telegram.WebApp.showAlert('Ошибка загрузки корзины. Проверьте консоль.');
     }
   }
 
@@ -172,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Remove from cart via OpenCart API
   async function removeFromCart(productId) {
     try {
-      const data = { product_id: productId, quantity: 0 }; // OpenCart may require setting quantity to 0
+      const data = { product_id: productId, quantity: 0 };
       const response = await fetch(`${API_BASE_URL}/cart/add&api_key=${API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -181,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (response.ok) {
         cart = cart.filter(item => item.id !== productId);
-        fetchCartProducts(); // Refresh cart from API
+        fetchCartProducts();
       } else {
         throw new Error('Ошибка удаления из корзины');
       }
@@ -200,15 +207,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const orderData = {
-        products: cart.map(item => ({
-          product_id: item.id,
-          quantity: item.quantity
-        })),
+        products: cart.map(item => ({ product_id: item.id, quantity: item.quantity })),
         customer: {
           firstname: user?.first_name || 'Гость',
           lastname: user?.last_name || '',
           email: 'guest@4kruga.ru',
-          telephone: ''
+          telephone: '+00000000000'
         },
         payment_method: 'cod',
         shipping_method: 'flat.flat'
@@ -274,6 +278,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle main button click
   Telegram.WebApp.MainButton.onClick(() => {
     cartSummary.classList.remove('hidden');
+  });
+
+  // Handle contact buttons
+  const phoneNumber = '+79991234567'; // Замените на реальный номер, например, +79991234567
+  whatsappBtn.addEventListener('click', () => {
+    Telegram.WebApp.openLink(`https://wa.me/${phoneNumber}`);
+  });
+  telegramBtn.addEventListener('click', () => {
+    Telegram.WebApp.openLink(`https://t.me/+${phoneNumber}`);
+  });
+  phoneBtn.addEventListener('click', () => {
+    Telegram.WebApp.openLink(`tel:${phoneNumber}`);
   });
 
   // Initial load
